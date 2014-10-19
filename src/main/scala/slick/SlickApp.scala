@@ -11,14 +11,8 @@ object SlickApp extends App {
     createSchema
 
     val scalaIo     = Conferences += Conference("Scala.IO 2014", "Paris")
-
-    val scalaxNoId = Conference("ScalaExchange", "London")
-    val scalaxId = (Conferences returning Conferences.map(_.id)) += scalaxNoId
-    val scalax = scalaxNoId.copy(id = Some(scalaxId))
-
-    val scalaDays = ((Conferences returning Conferences.map(_.id))
-      into ((conf, id) => conf.copy(id = Some(id) ) )
-      ) += Conference("Scala Days 2015", "SF")
+    val scalax      = Conferences += Conference("ScalaExchange", "London")
+    val scalaDays   = Conferences += Conference("Scala Days 2015", "SF")
 
     printBlock {
       s"""|Scala.IO        = $scalaIo
