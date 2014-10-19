@@ -16,7 +16,13 @@ object Schema {
 
   val Conferences = new IdTableQuery[Conference, ConferenceTable](tag => new ConferenceTable(tag)) {
     override def withId(model: Conference, id: Long): Conference = model.copy(id = Some(id))
+    override def extractId(model: Conference): Option[Long] = model.id
   }
+
+  implicit class ConferenceRecord(val model:Conference) extends ActiveRecord[Conference] {
+    val tableQuery = Conferences
+  }
+
 
 	def createSchema(implicit sess: Session) = Conferences.ddl.create
 

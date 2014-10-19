@@ -13,8 +13,27 @@ object SlickExtensions {
 
   }
 
+
+  abstract class BaseIdTableQuery[E, T <: Table[E]](cons: Tag => T) extends TableQuery(cons) {
+    def save(model:E)(implicit sess: Session) : E
+  }
+
+
   /** A TableQuery aware of IdTable's id Column*/
-  abstract class IdTableQuery[M, T <: IdTable[M]](cons: Tag => T) extends TableQuery(cons) {
+  abstract class IdTableQuery[M, T <: IdTable[M]](cons: Tag => T) extends BaseIdTableQuery[M, T](cons) {
+
+    def save(model:M)(implicit sess: Session) : M = {
+
+      extractId(model) match {
+
+        case Some(id) =>
+          this.update(model) // returns the number of affected rows
+          model // return the model
+
+        case None => add(model) // insert and return a clone with an Id
+
+      }
+    }
 
     def add(model:M)(implicit sess: Session) : M = {
       val id = (this returning this.map(_.id)) += model
@@ -22,8 +41,17 @@ object SlickExtensions {
     }
 
     def +=(model:M)(implicit sess: Session) : M = add(model)
-
     def withId(model: M, id: Long): M
+    def extractId(model:M) : Option[Long]
   }
 
+  trait ActiveRecord[M] {
+    import scala.slick.jdbc.JdbcBackend
+    type TableQuery = BaseIdTableQuery[M, _]
+
+    def tableQuery: TableQuery
+    def model: M
+
+    def save(implicit session: JdbcBackend#Session): M = tableQuery.save(model)
+  }
 }

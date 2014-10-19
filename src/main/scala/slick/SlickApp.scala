@@ -2,7 +2,6 @@ package slick
 
 import models.Conference
 import Schema._
-import DB.driver.simple._
 
 object SlickApp extends App {
 
@@ -10,9 +9,9 @@ object SlickApp extends App {
 
     createSchema
 
-    val scalaIo     = Conferences += Conference("Scala.IO 2014", "Paris")
-    val scalax      = Conferences += Conference("ScalaExchange", "London")
-    val scalaDays   = Conferences += Conference("Scala Days 2015", "SF")
+    val scalaIo     = Conference("Scala.IO 2014", "Paris").save
+    val scalax      = Conference("ScalaExchange", "London").save
+    val scalaDays   = Conference("Scala Days 2015", "SF").save
 
     printBlock {
       s"""|Scala.IO        = $scalaIo
