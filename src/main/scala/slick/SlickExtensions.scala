@@ -4,13 +4,11 @@ object SlickExtensions {
 
   import DB.driver.simple._
 
-  /** A Table with a well known id Column*/
-  abstract class IdTable[M](tag: Tag, schemaName: Option[String], tableName: String)
+  abstract class IdTable[M, I:BaseColumnType](tag: Tag, schemaName: Option[String], tableName: String)
     extends Table[M](tag, schemaName, tableName) {
 
-    def id:Column[Long]
+    def id:Column[I]
     def this(tag: Tag, tableName: String) = this(tag, None, tableName)
-
   }
 
 
@@ -21,7 +19,7 @@ object SlickExtensions {
 
 
   /** A TableQuery aware of IdTable's id Column*/
-  abstract class IdTableQuery[M, T <: IdTable[M]](cons: Tag => T) extends BaseIdTableQuery[M, T](cons) {
+  abstract class IdTableQuery[M, I:BaseColumnType, T <: IdTable[M, I]](cons: Tag => T) extends BaseIdTableQuery[M, T](cons) {
 
     def save(model:M)(implicit sess: Session) : M = {
 
@@ -43,18 +41,20 @@ object SlickExtensions {
 
     def +=(model:M)(implicit sess: Session) : M = add(model)
 
+
     def delete(model:M)(implicit sess:Session) : Boolean = {
       extractId(model).map(filterById(_).delete).getOrElse(0) > 1
     }
 
-    def filterById(id: Long)(implicit sess: Session) = filter(_.id === id)
-    def findById(id: Long)(implicit sess: Session): M = findOptionById(id).get
-    def findOptionById(id: Long)(implicit sess: Session): Option[M] = filterById(id).firstOption
+    def filterById(id: I)(implicit sess: Session) = filter(_.id === id)
+    def findById(id: I)(implicit sess: Session): M = findOptionById(id).get
+    def findOptionById(id: I)(implicit sess: Session): Option[M] = filterById(id).firstOption
 
     def fetchAll(implicit sess: Session) : List[M] = this.list
 
-    def withId(model: M, id: Long): M
-    def extractId(model:M) : Option[Long]
+    def withId(model: M, id: I): M
+    def extractId(model:M) : Option[I]
+
   }
 
   trait ActiveRecord[M] {
