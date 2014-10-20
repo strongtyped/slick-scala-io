@@ -1,7 +1,5 @@
 package models
 
-trait Entity[E <: Entity[E]] {
+trait Entity {
   type Id
-  def id : Option[E#Id]
-  def withId(id:E#Id): E
 }

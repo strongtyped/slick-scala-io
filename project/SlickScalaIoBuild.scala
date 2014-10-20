@@ -14,9 +14,9 @@ object SlickScalaIoBuild extends Build {
 
     
   //-- Dependencies -----------------------------------------------------------------------
-  val slick         =   "com.typesafe.slick"          %%    "slick"            %   "2.1.0"
-  val h2database    =   "com.h2database"              %     "h2"               %   "1.4.181"
-
+  val slick         =   "com.typesafe.slick"          %%    "slick"             %   "2.1.0"
+  val h2database    =   "com.h2database"              %     "h2"                %   "1.4.181"
+  
   val monocleVersion  = "0.5.1"
   val monocleCore     =   "com.github.julien-truffaut"  %%    "monocle-core"      % monocleVersion
   val monocleMacro    =   "com.github.julien-truffaut"  %%    "monocle-macro"     % monocleVersion

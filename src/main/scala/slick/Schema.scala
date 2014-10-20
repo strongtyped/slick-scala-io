@@ -1,11 +1,14 @@
 package slick
 
 import models.Conference
+import monocle.{SimpleLens, Lens, Lenser}
 
 trait Schema { self : Profile with SlickExtensions =>
 
   import driver.simple._
   
+  implicit val conferenceIdLens = Lenser[Conference](_.id)
+
   class ConferenceTable(tag: Tag) extends IdTable[Conference](tag, "CONFERENCE") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def name = column[String]("name", O.NotNull)

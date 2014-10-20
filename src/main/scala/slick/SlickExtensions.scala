@@ -1,12 +1,13 @@
 package slick
 
 import models.Entity
+import monocle.SimpleLens
 
 trait SlickExtensions { self : Profile =>
 
   import driver.simple._
 
-  abstract class IdTable[M <: Entity[M]](tag: Tag, schemaName: Option[String], tableName: String)(implicit ev1: BaseColumnType[M#Id])
+  abstract class IdTable[M <: Entity](tag: Tag, schemaName: Option[String], tableName: String)(implicit ev1: BaseColumnType[M#Id])
     extends Table[M](tag, schemaName, tableName) {
 
     def id:Column[M#Id]
@@ -21,13 +22,13 @@ trait SlickExtensions { self : Profile =>
 
 
   /** A TableQuery aware of IdTable's id Column*/
-  class IdTableQuery[M <: Entity[M], T <: IdTable[M]](cons: Tag => T)(implicit ev1: BaseColumnType[M#Id])
+  class IdTableQuery[M <: Entity, T <: IdTable[M]](cons: Tag => T)(implicit ev1: BaseColumnType[M#Id], idLens : SimpleLens[M, Option[M#Id]])
     extends BaseIdTableQuery[M, T](cons) {
 
 
     def save(model:M)(implicit sess: Session) : M = {
 
-      extractId(model) match {
+      idLens.get(model) match {
 
         case Some(id) =>
           this.update(model) // returns the number of affected rows
@@ -40,14 +41,14 @@ trait SlickExtensions { self : Profile =>
 
     def add(model:M)(implicit sess: Session) : M = {
       val id = (this returning this.map(_.id)) += model
-      withId(model, id)
+      idLens.set(model, Option(id))
     }
 
     def +=(model:M)(implicit sess: Session) : M = add(model)
 
 
     def delete(model:M)(implicit sess:Session) : Boolean = {
-      extractId(model).map(filterById(_).delete).getOrElse(0) > 1
+      idLens.get(model).map(filterById(_).delete).getOrElse(0) > 1
     }
 
     def filterById(id: M#Id)(implicit sess: Session) = filter(_.id === id)
@@ -55,10 +56,6 @@ trait SlickExtensions { self : Profile =>
     def findOptionById(id: M#Id)(implicit sess: Session): Option[M] = filterById(id).firstOption
 
     def fetchAll(implicit sess: Session) : List[M] = this.list
-
-
-    def withId(model: M, id: M#Id): M = model.withId(id)
-    def extractId(model:M) : Option[M#Id] = model.id
 
   }
 
