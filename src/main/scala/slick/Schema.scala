@@ -2,11 +2,9 @@ package slick
 
 import models.Conference
 
-object Schema {
+trait Schema { self : Profile with SlickExtensions =>
 
-  import SlickExtensions._
-  import DB.driver.simple._
-
+  import driver.simple._
   
   class ConferenceTable(tag: Tag) extends IdTable[Conference](tag, "CONFERENCE") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)

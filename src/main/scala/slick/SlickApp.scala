@@ -1,7 +1,7 @@
 package slick
 
 import models.Conference
-import Schema._
+import SlickCake.instance._
 
 object SlickApp extends App {
 

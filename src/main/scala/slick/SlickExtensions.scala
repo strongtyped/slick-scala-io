@@ -2,9 +2,9 @@ package slick
 
 import models.Entity
 
-object SlickExtensions {
+trait SlickExtensions { self : Profile =>
 
-  import DB.driver.simple._
+  import driver.simple._
 
   abstract class IdTable[M <: Entity[M]](tag: Tag, schemaName: Option[String], tableName: String)(implicit ev1: BaseColumnType[M#Id])
     extends Table[M](tag, schemaName, tableName) {
