@@ -18,6 +18,25 @@ object SlickApp extends App {
           |Scala eXchange  = $scalax
           |Scala Days      = $scalaDays """.stripMargin
     }
+
+    
+    printBlock {
+      s"Found by Id: ${Conferences.findById(1)}"
+    }
+
+    printBlock {
+      scalaIo.delete
+      "Deleted " + scalaIo
+    }
+
+    printBlock {
+      s"""
+         |Printing all conferences:
+         |${Conferences.fetchAll.mkString("\n")}
+       """.stripMargin
+
+    }
+
   }
 
   def printBlock(block: => String): Unit = {
